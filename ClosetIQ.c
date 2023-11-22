@@ -19,8 +19,12 @@ void createDirectory(const char *path);
 void userMenu();
 void modifyCloset();
 
+void addClothesToCloset();
+void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothing[100], int quantityOfClothing);
+
 int main()
 {
+    char *path = returnSavePath();
     userMenu();
 }
 
@@ -60,6 +64,9 @@ void userMenu()
 }
 
 void viewCloset()
+/*
+Shows the user's closet and current formatting.
+*/
 {
     char *path = returnSavePath();
 
@@ -89,10 +96,93 @@ void viewCloset()
     free(path);
 }
 
-void modifyCloset(){
+void modifyCloset()
+/*
+Allows the user to modify their closet. Add, remove, and change operations for the items within.
+*/
+{   
+    int userModifyInput;
+    printf("==============================================\n");
+    printf("%30s\n\n", "Modify Closet.");
+    printf("What would you like to do?\n");
+    printf("1.) Add items from the closet.\n");
+    printf("2.) Remove items from the closet.\n");
+    printf("3.) Change existing items in the closet.\n");
+    printf("4.) Return to the menu.\n");
+    printf("==============================================\n");
+    printf("> ");
+    scanf("%d", &userModifyInput);
 
+    switch(userModifyInput)
+    {
+        case 1:
+        {
+            addClothesToCloset();
+            break;
+        }
+        case 2:
+        {
+            break;
+        }
+        case 3:
+        {
+            break;
+        }
+        case 4:
+        {
+            userMenu();
+            break;
+        }
+        default:
+        {
+            printf("That value was not allowed.\n");
+            modifyCloset();
+            break;
+        }
+    }
 }
 
+void addClothesToCloset()
+{
+    char nameOfTypeOfClothing[100];
+    printf("What is the type of clothing?\n");
+    printf("> ");
+    scanf("%99s", nameOfTypeOfClothing);
+
+    char nameOfColorOfClothing[100];
+    printf("\nWhat is the name of the color of the %ss?\n", nameOfTypeOfClothing);
+    printf("> ");
+    scanf("%99s", nameOfColorOfClothing);
+
+    int quantityOfClothing;
+    printf("\nHow many %s %ss do you have?\n", nameOfColorOfClothing, nameOfTypeOfClothing);
+    printf("> ");
+    scanf("%d", &quantityOfClothing);
+    confirmAddToCloset(nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
+}
+
+void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothing[100], int quantityOfClothing){
+    char userConfirmation;
+    printf("==============================================\n");
+    printf("Type: %s\nColor: %s\nQuantity: %d\n\n", nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
+    printf("Are these correct? (Y/N)\n");
+    printf("> ");
+    scanf(" %c", &userConfirmation);
+    if (userConfirmation == 'Y'){
+        printf("The values are being written to the closet.\n");
+        /*
+        Write values to closet here.
+        */
+        modifyCloset();
+    }else if (userConfirmation == 'N'){
+        printf("Please try again.\n");
+        addClothesToCloset();
+    }else{
+        printf("That value was not recognized\n");
+        confirmAddToCloset(nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
+    }
+    printf("==============================================\n");
+}
 
 void createDirectory(const char *path)
 {
