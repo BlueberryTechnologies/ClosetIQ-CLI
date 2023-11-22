@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
@@ -10,55 +11,112 @@
 /*
 This will be a project to get the basic functionality of the program.
 */
-void closetIQFileManager();
+
+char *returnSavePath();
 void viewCloset();
-char* getUserHomeDir();
-void createDirectory(const char* path);
-
+char *getUserHomeDir();
+void createDirectory(const char *path);
 void userMenu();
+void modifyCloset();
 
-
-int main(){
-    closetIQFileManager(); // This is the file manager for the program. This will initialize the current files for the usage in the program.
+int main()
+{
     userMenu();
 }
 
-void userMenu(){
-    printf("=========================\nClosetIQ (Command Line Version!)\nMade by Blueberry Technologies\n\nPlease review the menu.\n\n1.) View the current closet.\n2.) Modify the current closet.\n3.) Choose an outfit\n4.) Delete the current closet and define a new one.\n> ");
+void userMenu()
+{
+    printf("==============================================\n");
+    printf("%39s\n","ClosetIQ (Command Line Version!)");
+    printf("%38s\n\n","Made by Blueberry Technologies");
+    printf("1.) View the current closet.\n");
+    printf("2.) Modify the current closet.\n");
+    printf("3.) Choose an outfit (Coming Soon!)\n");
+    printf("4.) Delete the current closet. (Coming Soon!)\n");
+    printf("==============================================\n");
+    printf("> ");
     int userChoice;
     scanf("%d", &userChoice);
 
-    switch(userChoice){
-        case 1:
-            viewCloset();
-            break;
-        default:
-            printf("That choice was not allowed.\n");
+    switch (userChoice)
+    {
+    case 1:
+        viewCloset();
+        break;
+    case 2:
+        modifyCloset();
+        break;
+    case 3:
+        printf("Coming soon!\n");
+        break;
+    case 4:
+        printf("Coming soon!\n");
+        break;
+    default:
+        printf("That choice was not allowed.\n");
+        userMenu();
+        break;
     }
 }
 
-void viewCloset(){
-    printf("Here is the current closet:");
-}
+void viewCloset()
+{
+    char *path = returnSavePath();
 
-void createDirectory(const char* path){
-    #ifdef _WIN32
-    _mkdir(path);
-    #else
-    mkdir(path, 0755);
-    #endif
-
-}
-
-void closetIQFileManager(){
-    FILE* closetData; // Make a pointer to point to the contents of the file.
-    char* homeDir = getUserHomeDir();
-    // Allocate enough space for the new path
-    char* dirPath = malloc(strlen(homeDir) + strlen("/ClosetIQ-CLI") + 1);
-    if (dirPath == NULL) {
-        printf("Memory allocation failed.\n");
-        free(homeDir); // Don't forget to free homeDir if it was dynamically allocated
+    if (path == NULL){
+        fprintf(stderr, "The path was not found.\n");
         return;
+    }
+    printf("The path is: %s\n", path);
+    FILE *file = fopen(path, "r");
+
+    if (file == NULL){
+        fprintf(stderr, "Could not open the closet.\n");
+        return;
+    }
+    char typeOfClothes[100];
+    char colorOfClothes[100];
+    int quantity;
+
+    printf("==================================================\n");
+    printf("%-20s %-20s %s\n", "Type of Clothes", "Color of Clothes", "Quantity");
+    printf("==================================================\n");
+    while (fscanf(file, "%99s %99s %d", typeOfClothes, colorOfClothes, &quantity) == 3){
+        printf("%-20s %-20s %d\n", typeOfClothes, colorOfClothes, quantity);
+    }
+
+    fclose(file);
+    free(path);
+}
+
+void modifyCloset(){
+
+}
+
+
+void createDirectory(const char *path)
+{
+#ifdef _WIN32
+    _mkdir(path);
+#else
+    mkdir(path, 0755);
+#endif
+}
+
+char *returnSavePath() {
+    FILE *closetData;
+    char *homeDir = getUserHomeDir();
+    if (homeDir == NULL) {
+        fprintf(stderr, "Failed to get the user home directory.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Allocate enough space for the new path
+    char *dirPath = malloc(strlen(homeDir) + strlen("/ClosetIQ-CLI") + 1);
+    if (dirPath == NULL) {
+        fprintf(stderr, "Memory allocation failed for directory path.\n");
+        free(homeDir);
+        exit(EXIT_FAILURE);
     }
     strcpy(dirPath, homeDir);
     strcat(dirPath, "/ClosetIQ-CLI");
@@ -67,26 +125,26 @@ void closetIQFileManager(){
     createDirectory(dirPath);
 
     // Append the filename to the directory path
-    char* filePath = realloc(dirPath, strlen(dirPath) + strlen("/closetIQData.txt") + 1);
+    char *filePath = realloc(dirPath, strlen(dirPath) + strlen("/closetIQData.txt") + 1);
     if (filePath == NULL) {
-        printf("Memory allocation failed.\n");
-        free(dirPath);
+        fprintf(stderr, "Memory allocation failed for file path.\n");
         free(homeDir);
-        return;
+        exit(EXIT_FAILURE);
     }
     strcat(filePath, "/closetIQData.txt");
 
     // Attempt to open the file for reading
     closetData = fopen(filePath, "r");
-
     if (closetData == NULL) {
-        // The file wasn't found, try to create it
-        printf("The file was not found.\n");
+        printf("The file was not found, creating a new file...\n");
         closetData = fopen(filePath, "w");
-        if (closetData != NULL) {
-            printf("The file was created at: %s\n", filePath);
+        if (closetData == NULL) {
+            fprintf(stderr, "Failed to create the file at: %s\n", filePath);
+            free(filePath);
+            free(homeDir);
+            exit(EXIT_FAILURE);
         } else {
-            perror("Error");
+            printf("The file was created at: %s\n", filePath);
         }
     }
 
@@ -95,35 +153,40 @@ void closetIQFileManager(){
         fclose(closetData);
     }
 
-    // Free the allocated memory
-    free(filePath); // Note: filePath and dirPath point to the same block of memory after realloc
-    free(homeDir);
+    free(homeDir); // Free homeDir after it's no longer needed
+
+    // Return filePath which now contains the path to the file
+    return filePath;
 }
+char *getUserHomeDir()
+{
+    char *homeDir;
 
-char* getUserHomeDir(){
-    char* homeDir;
-
-    #ifdef _WIN32
-        homeDir = getenv("USERPROFILE");
-        if(homeDir == NULL) {
-            homeDir = getenv("HOMEDRIVE");
-            if(homeDir != NULL) {
-                char* homePath = getenv("HOMEPATH");
-                if(homePath != NULL) {
-                    char* fullPath = malloc(strlen(homeDir) + strlen(homePath) + 1);
-                    strcpy(fullPath, homeDir);
-                    strcat(fullPath, homePath);
-                    return fullPath; // Caller must free this
-                }
+#ifdef _WIN32
+    homeDir = getenv("USERPROFILE");
+    if (homeDir == NULL)
+    {
+        homeDir = getenv("HOMEDRIVE");
+        if (homeDir != NULL)
+        {
+            char *homePath = getenv("HOMEPATH");
+            if (homePath != NULL)
+            {
+                char *fullPath = malloc(strlen(homeDir) + strlen(homePath) + 1);
+                strcpy(fullPath, homeDir);
+                strcat(fullPath, homePath);
+                return fullPath; // Caller must free this
             }
         }
-        #else
-        // On Unix-like systems, use HOME environment variable
-        homeDir = getenv("HOME");
+    }
+#else
+    // On Unix-like systems, use HOME environment variable
+    homeDir = getenv("HOME");
 
-    #endif
+#endif
 
-    if (homeDir == NULL){
+    if (homeDir == NULL)
+    {
         printf("Cannot find the home directory.\n");
         exit(EXIT_FAILURE);
     }
