@@ -14,14 +14,28 @@ ClosetIQ-CLI
 Blueberry Technologies
 Riley Richard (gh/rileyrichard)
 This will be a project to get the basic functionality of the program.
+
+Synopsis:
+Virtual Closet which you can organize, view, and modify various types of clothing.
+Closet is viewable and modifiable through the terminal.
+Closet information is stored in the user's home folder, or document folder depending on operating system.
 */
 
-char *returnSavePath();
+int globalIndex;
+
+
+void clearStdin();
+int getLatestIndex();
+void pressEnter();
+char *returnSavePath(int number);
 void viewCloset();
 char *getUserHomeDir();
 void createDirectory(const char *path);
 void userMenu();
 void modifyCloset();
+void pressEnter();
+void removeItem(int targetIndex);
+void userRemoveIndex();
 
 void addClothesToCloset();
 void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothing[100], int quantityOfClothing);
@@ -30,7 +44,7 @@ void removeCloset();
 
 int main()
 {
-    char *path = returnSavePath();
+    char *path = returnSavePath(0);
     userMenu();
 }
 
@@ -58,7 +72,11 @@ void userMenu()
         modifyCloset();
         break;
     case 3:
+        /*
         printf("Coming soon!\n");
+        pressEnter();
+        */
+        getLatestIndex();
         break;
     case 4:
         removeCloset();
@@ -72,12 +90,27 @@ void userMenu()
     }
 }
 
+/*
+
+Setters and Getters
+
+*/
+
+void setIndex(int index){
+    index = globalIndex;
+}
+
+int getIndex(){
+    return globalIndex;
+}
+
+
 void viewCloset()
 /*
 Shows the user's closet and current formatting.
 */
 {
-    char *path = returnSavePath();
+    char *path = returnSavePath(0);
 
     if (path == NULL)
     {
@@ -94,41 +127,20 @@ Shows the user's closet and current formatting.
     char typeOfClothes[100];
     char colorOfClothes[100];
     int quantity;
+    int index;
 
-    printf("==================================================\n");
-    printf("%-20s %-20s %s\n", "Type of Clothes", "Color of Clothes", "Quantity");
-    printf("==================================================\n");
-    while (fscanf(file, "%99s %99s %d", typeOfClothes, colorOfClothes, &quantity) == 3)
+    printf("\n\n\n=============================================================\n");
+    printf("%-10s %-20s %-20s %s\n", "Index", "Type of Clothes", "Color of Clothes", "Quantity");
+    printf("=============================================================\n");
+    while (fscanf(file, "%d %99s %99s %d", &index, typeOfClothes, colorOfClothes, &quantity) == 4)
     {
-        printf("%-20s %-20s %d\n", typeOfClothes, colorOfClothes, quantity);
+        printf("%-10d %-20s %-20s %d\n", index, typeOfClothes, colorOfClothes, quantity);
     }
     char userConfirmation;
     fclose(file);
     free(path);
-    printf("==================================================\n");
-    printf("Press enter to continue.\n");
-    char ch;
-	//infinite loop
-	while(1)
-	{
-		printf("Enter any character: \n");
-		//read a single character
-		ch=fgetc(stdin);
-		
-		if(ch==0x0A)
-		{
-			printf("ENTER KEY is pressed.\n");
-			break;
-		}
-		else
-		{
-			printf("%c is pressed.\n",ch);
-		}
-		//read dummy character to clear
-		//input buffer, which inserts after character input
-		ch=getchar();
-	}
-    
+    printf("=============================================================\n");
+    pressEnter();
 }
 
 void modifyCloset()
@@ -138,10 +150,11 @@ Allows the user to modify their closet. Add, remove, and change operations for t
 {
     int userModifyInput;
     printf("==============================================\n");
+    printf("%39s\n", "ClosetIQ (Command Line Version!)");
     printf("%30s\n\n", "Modify Closet.");
     printf("What would you like to do?\n");
     printf("1.) Add items to the closet.\n");
-    printf("2.) Remove items from the closet. (Coming Soon)\n");
+    printf("2.) Remove items from the closet.\n");
     printf("3.) Change existing items in the closet. (Coming Soon)\n");
     printf("4.) Return to the menu.\n");
     printf("==============================================\n");
@@ -157,10 +170,13 @@ Allows the user to modify their closet. Add, remove, and change operations for t
     }
     case 2:
     {
+        userRemoveIndex();
         break;
     }
     case 3:
     {
+        printf("Feature Coming Soon!\n");
+        pressEnter();
         break;
     }
     case 4:
@@ -191,19 +207,18 @@ void addClothesToCloset()
     scanf("%99s", nameOfTypeOfClothing);
 
     char nameOfColorOfClothing[100];
-    printf("\nWhat is the name of the color of the %ss?\n", nameOfTypeOfClothing);
+    printf("\nWhat is the name of the color of the %s(s)?\n", nameOfTypeOfClothing);
     printf("> ");
     scanf("%99s", nameOfColorOfClothing);
 
     int quantityOfClothing;
-    printf("\nHow many %s %ss do you have?\n", nameOfColorOfClothing, nameOfTypeOfClothing);
+    printf("\nHow many %s %s(s) do you have?\n", nameOfColorOfClothing, nameOfTypeOfClothing);
     printf("> ");
     if (scanf("%d", &quantityOfClothing) != 1)
     {
         printf("Invalid input for quantity, please enter an integer.\n");
         int c;
-        while ((c = getchar()) != '\n' && c != EOF)
-            ;
+        while ((c = getchar()) != '\n' && c != EOF);
         addClothesToCloset();
     }
     if (nameOfTypeOfClothing[0] == '\0' || nameOfColorOfClothing[0] == '\0' || quantityOfClothing == 0)
@@ -225,11 +240,12 @@ void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothi
     scanf(" %c", &userConfirmation);
     if (tolower(userConfirmation) == 'y')
     {
+        int index = getLatestIndex() + 1;
         printf("The values are being written to the closet.\n");
-        FILE *file = fopen(returnSavePath(), "a");
+        FILE *file = fopen(returnSavePath(0), "a");
         if (file)
         {
-            fprintf(file, "%s   %s  %d\n", nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
+            fprintf(file, "%d %s   %s  %d\n", index, nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
             fclose(file);
         }
         printf("The values were successfully written to the closet.\n");
@@ -256,7 +272,7 @@ REMOVE CLOSET
 
 void removeCloset()
 {
-    FILE *file = fopen(returnSavePath(), "w");
+    FILE *file = fopen(returnSavePath(0), "w");
     fprintf(file, "");
     fclose(file);
     int fileContents = fgetc(file);
@@ -264,7 +280,7 @@ void removeCloset()
     if (fileContents == EOF)
     {
         printf("The contents were deleted successfully!\n");
-        userMenu();
+        pressEnter();
     }
     else
     {
@@ -273,12 +289,123 @@ void removeCloset()
     }
 }
 
+void userRemoveIndex(){
+    int userRemoveIndexChoice;
+    printf("Which entry would you like to remove?\nPlease enter the index number.\n> ");
+    scanf("%d", &userRemoveIndexChoice);
+    removeItem(userRemoveIndexChoice);
+}
+
+void removeItem(int targetIndex){
+    char *path = returnSavePath(0);
+
+    if (path == NULL) {
+        fprintf(stderr, "The path was not found.\n");
+        return;
+    }
+
+    FILE *inputFile = fopen(returnSavePath(0), "r");
+
+    if (inputFile == NULL) {
+        fprintf(stderr, "Could not open the file.\n");
+        return;
+    }
+
+    FILE *outputFile = fopen(returnSavePath(1), "w");  // Create a temporary file
+
+    if (outputFile == NULL) {
+        fprintf(stderr, "Could not create the temporary file.\n");
+        fclose(inputFile);
+        return;
+    }
+
+    
+    int index;
+    char nameOfClothing[100];
+    char nameOfColorOfClothing[100];
+    int quantity;
+    int count = 1;
+
+    while (fscanf(inputFile, "%d %s %s %d", &index, nameOfClothing, nameOfColorOfClothing, &quantity) == 4) {
+        if (index != targetIndex) {
+            fprintf(outputFile, "%d %s %s %d\n", count, nameOfClothing, nameOfColorOfClothing, quantity);
+            count++;
+        }
+    }
+
+    fclose(outputFile);
+    fclose(inputFile);
+    remove(path);
+    rename(returnSavePath(1), path);
+    printf("The value at index %d was removed correctly!\n", targetIndex);
+    pressEnter();
+}
+
 /*
 
 FILE IO
 
 
 */
+
+int getLatestIndex(){
+    char *path = returnSavePath(0);
+
+    if (path == NULL)
+    {
+        fprintf(stderr, "The path was not found.\n");
+        return -1;
+    }
+    FILE *file = fopen(path, "r");
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Could not open the closet.\n");
+        return -1;
+    }
+
+    int index;
+
+    while (fscanf(file, "%d %*s %*s %*d", &index) != 1)
+    {
+        return 0;
+    }
+
+    while (fscanf(file, "%d %*s %*s %*d", &index) == 1)
+    {
+        printf("Index: %d\n", index);
+        index = index;
+    }
+
+    
+
+    printf("The index is: %d\n", index);
+    
+    return index;
+}
+
+
+void pressEnter(){
+    printf("Press the ENTER key to continue back to the menu:");
+    clearStdin();
+    int userProceed = getc(stdin);
+    userMenu();
+}
+
+void clearStdin()
+{
+    // keep reading 1 more char as long as the end of the stream, indicated by the newline char,
+    // has NOT been reached
+    while (true)
+    {
+        int c = getc(stdin);
+        if (c == EOF || c == '\n')
+        {
+            break;
+        }
+    }
+}
+
 
 void createDirectory(const char *path)
 {
@@ -289,7 +416,7 @@ void createDirectory(const char *path)
 #endif
 }
 
-char *returnSavePath()
+char *returnSavePath(int modifier)
 {
     FILE *closetData;
     char *homeDir = getUserHomeDir();
@@ -321,24 +448,36 @@ char *returnSavePath()
         free(homeDir);
         exit(EXIT_FAILURE);
     }
-    strcat(filePath, "/closetIQData.txt");
+    if (modifier == 0){
+        strcat(filePath, "/closetIQData.txt");
+    }else if(modifier == 1){
+        strcat(filePath, "/closetIQDataTemp.txt");
+    }
 
     // Attempt to open the file for reading
     closetData = fopen(filePath, "r");
     if (closetData == NULL)
     {
-        printf("The file was not found, creating a new file...\n");
+        if (modifier == 0){
+            printf("The file was not found, creating a new file...\n");
+        }
+        
         closetData = fopen(filePath, "w");
         if (closetData == NULL)
         {
-            fprintf(stderr, "Failed to create the file at: %s\n", filePath);
+            if (modifier == 0){
+                fprintf(stderr, "Failed to create the file at: %s\n", filePath);
+            }
             free(filePath);
             free(homeDir);
             exit(EXIT_FAILURE);
         }
         else
         {
-            printf("The file was created at: %s\n", filePath);
+            if (modifier == 0){
+                printf("The file was created at: %s\n", filePath);
+            }
+            
         }
     }
 
