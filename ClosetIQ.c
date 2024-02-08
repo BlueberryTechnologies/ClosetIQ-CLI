@@ -9,6 +9,8 @@
 #include <sys/stat.h> // For mkdir on Unix/Linux
 #endif
 
+#define MAX_USER_ENTERABLE_SIZE 256
+
 /*
 ClosetIQ-CLI
 Blueberry Technologies
@@ -201,15 +203,21 @@ ADD TO CLOSET
 
 void addClothesToCloset()
 {
-    char nameOfTypeOfClothing[100];
-    printf("What is the type of clothing?\n");
-    printf("> ");
-    scanf("%99s", nameOfTypeOfClothing);
+    char *nameOfTypeOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
+    printf("What is the name of the clothing?\n> ");
+    getchar();
+    if (fgets(nameOfTypeOfClothing, 255, stdin))
+    {
+        nameOfTypeOfClothing[strcspn(nameOfTypeOfClothing, "\n")] = 0;
+    }
 
-    char nameOfColorOfClothing[100];
-    printf("\nWhat is the name of the color of the %s(s)?\n", nameOfTypeOfClothing);
-    printf("> ");
-    scanf("%99s", nameOfColorOfClothing);
+    char *nameOfColorOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
+    printf("What is the name of the color of the %s(s)?\n> ", nameOfTypeOfClothing);
+    getchar();
+    if (fgets(nameOfColorOfClothing, 255, stdin))
+    {
+        nameOfColorOfClothing[strcspn(nameOfColorOfClothing, "\n")] = 0;
+    }
 
     int quantityOfClothing;
     printf("\nHow many %s %s(s) do you have?\n", nameOfColorOfClothing, nameOfTypeOfClothing);
@@ -226,8 +234,16 @@ void addClothesToCloset()
         printf("One or more values are NULL or 0, please try again!\n");
         addClothesToCloset();
     }
+    /*
+    char nameOfColorOfClothing[100];
+    printf("\nWhat is the name of the color of the %s(s)?\n", nameOfTypeOfClothing);
+    printf("> ");
+    scanf("%99s", nameOfColorOfClothing);
+
+    
 
     confirmAddToCloset(nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
+    */
 }
 
 void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothing[100], int quantityOfClothing)
