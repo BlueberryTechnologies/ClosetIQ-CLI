@@ -515,7 +515,7 @@ char *getUserHomeDir()
 #ifdef _WIN32
     homeDir = getenv("USERPROFILE");
     if (homeDir == NULL)
-    {
+    { 
         homeDir = getenv("HOMEDRIVE");
         if (homeDir != NULL)
         {
