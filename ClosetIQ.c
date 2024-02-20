@@ -201,49 +201,73 @@ ADD TO CLOSET
 
 */
 
-void addClothesToCloset()
-{
-    char *nameOfTypeOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    printf("What is the name of the clothing?\n> ");
-    getchar();
-    if (fgets(nameOfTypeOfClothing, 255, stdin))
-    {
-        nameOfTypeOfClothing[strcspn(nameOfTypeOfClothing, "\n")] = 0;
-    }
+char* returnNameOfColor(){
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
 
     char *nameOfColorOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    printf("What is the name of the color of the %s(s)?\n> ", nameOfTypeOfClothing);
-    getchar();
+    printf("What is the name of the color of the clothing?\n> ");
+    
     if (fgets(nameOfColorOfClothing, 255, stdin))
     {
         nameOfColorOfClothing[strcspn(nameOfColorOfClothing, "\n")] = 0;
     }
+    printf("Press ENTER to continue.");
+    return nameOfColorOfClothing;
+}
 
-    int quantityOfClothing;
-    printf("\nHow many %s %s(s) do you have?\n", nameOfColorOfClothing, nameOfTypeOfClothing);
-    printf("> ");
-    if (scanf("%d", &quantityOfClothing) != 1)
+char* returnNameOfType(){
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+
+    char *nameOfTypeOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
+    printf("What is the name of the clothing?\n> ");
+    
+    if (fgets(nameOfTypeOfClothing, 255, stdin))
     {
-        printf("Invalid input for quantity, please enter an integer.\n");
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
-        addClothesToCloset();
+        nameOfTypeOfClothing[strcspn(nameOfTypeOfClothing, "\n")] = 0;
     }
-    if (nameOfTypeOfClothing[0] == '\0' || nameOfColorOfClothing[0] == '\0' || quantityOfClothing == 0)
+    printf("Press ENTER to continue.");
+    return nameOfTypeOfClothing;
+}
+
+char* returnQuantityOfClothing(){
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+
+    char *quantityOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
+    printf("What is the quantity of the clothing?\n> ");
+    
+    if (fgets(quantityOfClothing, 255, stdin))
+    {
+        quantityOfClothing[strcspn(quantityOfClothing, "\n")] = 0;
+    }
+    return quantityOfClothing;
+}
+
+void addClothesToCloset()
+{
+
+    char *currentClothesType = returnNameOfType();
+    char *currentClothesColor = returnNameOfColor();
+    char *currentClothesQuantity = returnQuantityOfClothing();
+
+    
+    if (currentClothesType[0] == '\0' || currentClothesColor[0] == '\0' || currentClothesQuantity == 0)
     {
         printf("One or more values are NULL or 0, please try again!\n");
         addClothesToCloset();
     }
-    /*
-    char nameOfColorOfClothing[100];
-    printf("\nWhat is the name of the color of the %s(s)?\n", nameOfTypeOfClothing);
-    printf("> ");
-    scanf("%99s", nameOfColorOfClothing);
-
     
 
-    confirmAddToCloset(nameOfTypeOfClothing, nameOfColorOfClothing, quantityOfClothing);
-    */
+    printf("Color: %s\nType: %s\nQuantity: %s\n", currentClothesColor, currentClothesType, currentClothesQuantity);
+
+    int currentClothesQuantityInt = atoi(currentClothesQuantity);
+    
+    confirmAddToCloset(currentClothesType, currentClothesColor, currentClothesQuantityInt);
+    
 }
 
 void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothing[100], int quantityOfClothing)
@@ -295,7 +319,7 @@ void removeCloset()
 
     if (fileContents == EOF)
     {
-        printf("The contents were deleted successfully!\n");
+        printf("The closet was deleted successfully!\n");
         pressEnter();
     }
     else
@@ -341,20 +365,29 @@ void removeItem(int targetIndex){
     char nameOfColorOfClothing[100];
     int quantity;
     int count = 1;
+    bool thingsDeleted = false;
 
     while (fscanf(inputFile, "%d %s %s %d", &index, nameOfClothing, nameOfColorOfClothing, &quantity) == 4) {
         if (index != targetIndex) {
             fprintf(outputFile, "%d %s %s %d\n", count, nameOfClothing, nameOfColorOfClothing, quantity);
             count++;
         }
+        else{
+            thingsDeleted = true;
+        }
     }
 
-    fclose(outputFile);
-    fclose(inputFile);
-    remove(path);
-    rename(returnSavePath(1), path);
-    printf("The value at index %d was removed correctly!\n", targetIndex);
-    pressEnter();
+    if (thingsDeleted){
+        fclose(outputFile);
+        fclose(inputFile);
+        remove(path);
+        rename(returnSavePath(1), path);
+        printf("The value at index %d was removed successfully!\n", targetIndex);
+        pressEnter();
+    }else{
+        printf("There are no values at that index. Try again.\n");
+        pressEnter();
+    }
 }
 
 /*
@@ -515,7 +548,7 @@ char *getUserHomeDir()
 #ifdef _WIN32
     homeDir = getenv("USERPROFILE");
     if (homeDir == NULL)
-    { 
+    {
         homeDir = getenv("HOMEDRIVE");
         if (homeDir != NULL)
         {
