@@ -38,6 +38,10 @@ void modifyCloset();
 void pressEnter();
 void removeItem(int targetIndex);
 void userRemoveIndex();
+void modifyClosetIndex(int userIndex);
+void userSpecifyChangedIndex();
+void pressEnterOther();
+
 
 void addClothesToCloset();
 void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothing[100], int quantityOfClothing);
@@ -130,13 +134,18 @@ Shows the user's closet and current formatting.
     char colorOfClothes[100];
     int quantity;
     int index;
-
+    bool thingsInCloset = false;
     printf("\n\n\n=============================================================\n");
     printf("%-10s %-20s %-20s %s\n", "Index", "Type of Clothes", "Color of Clothes", "Quantity");
     printf("=============================================================\n");
     while (fscanf(file, "%d %99s %99s %d", &index, typeOfClothes, colorOfClothes, &quantity) == 4)
     {
         printf("%-10d %-20s %-20s %d\n", index, typeOfClothes, colorOfClothes, quantity);
+        thingsInCloset = true;
+    }
+
+    if (!thingsInCloset){
+        printf("%41s", "The closet is empty!\n");
     }
     char userConfirmation;
     fclose(file);
@@ -156,9 +165,8 @@ Allows the user to modify their closet. Add, remove, and change operations for t
     printf("%30s\n\n", "Modify Closet.");
     printf("What would you like to do?\n");
     printf("1.) Add items to the closet.\n");
-    printf("2.) Remove items from the closet.\n");
-    printf("3.) Change existing items in the closet. (Coming Soon)\n");
-    printf("4.) Return to the menu.\n");
+    printf("2.) Change existing items in the closet.\n");
+    printf("3.) Return to the menu.\n");
     printf("==============================================\n");
     printf("> ");
     scanf("%d", &userModifyInput);
@@ -172,16 +180,11 @@ Allows the user to modify their closet. Add, remove, and change operations for t
     }
     case 2:
     {
-        userRemoveIndex();
-        break;
-    }
-    case 3:
-    {
-        printf("Feature Coming Soon!\n");
+        userSpecifyChangedIndex();
         pressEnter();
         break;
     }
-    case 4:
+    case 3:
     {
         userMenu();
         break;
@@ -329,11 +332,55 @@ void removeCloset()
     }
 }
 
-void userRemoveIndex(){
-    int userRemoveIndexChoice;
-    printf("Which entry would you like to remove?\nPlease enter the index number.\n> ");
-    scanf("%d", &userRemoveIndexChoice);
-    removeItem(userRemoveIndexChoice);
+
+
+void userSpecifyChangedIndex(){
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+
+    char *specifiedIndex = malloc(MAX_USER_ENTERABLE_SIZE);
+    printf("What is the index you would like to modify?\n> ");
+    
+    if (fgets(specifiedIndex, 255, stdin))
+    {
+        specifiedIndex[strcspn(specifiedIndex, "\n")] = 0;
+    }
+    printf("Press ENTER to continue.");
+    modifyClosetIndex(atoi(specifiedIndex));
+}
+
+void modifyClosetIndex(int userIndex){
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+
+    char *modifyIndexChoice = malloc(MAX_USER_ENTERABLE_SIZE);
+    printf("==============================================\n");
+    printf("%39s\n", "ClosetIQ (Command Line Version!)");
+    printf("%29s %i\n\n", "Modified index:", userIndex);
+    printf("1.) Change index.\n");
+    printf("2.) Remove index from closet.\n");
+    printf("3.) Return to main menu.\n");
+    printf("==============================================\n");
+    printf("> ");
+    
+    if (fgets(modifyIndexChoice, 255, stdin))
+    {
+        modifyIndexChoice[strcspn(modifyIndexChoice, "\n")] = 0;
+    }
+
+    int selectedChoice = atoi(modifyIndexChoice);
+
+    switch(selectedChoice){
+        case 1:
+            break;
+        case 2:
+            removeItem(userIndex);
+        case 3:
+            pressEnterOther();
+        default:
+            printf("I'm sorry that value was not allowed. Try again");
+            pressEnter();
+    }
 }
 
 void removeItem(int targetIndex){
@@ -383,10 +430,10 @@ void removeItem(int targetIndex){
         remove(path);
         rename(returnSavePath(1), path);
         printf("The value at index %d was removed successfully!\n", targetIndex);
-        pressEnter();
+        pressEnterOther();
     }else{
         printf("There are no values at that index. Try again.\n");
-        pressEnter();
+        pressEnterOther();
     }
 }
 
@@ -436,7 +483,13 @@ int getLatestIndex(){
 
 void pressEnter(){
     printf("Press the ENTER key to continue back to the menu:");
+    int userProceed = getc(stdin);
     clearStdin();
+    userMenu();
+}
+
+void pressEnterOther(){
+    printf("Press the ENTER key to continue back to the menu:");
     int userProceed = getc(stdin);
     userMenu();
 }
