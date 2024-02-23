@@ -29,12 +29,13 @@
 *.dylib
 
 # Executables
-#*.exe
+*.exe
 *.out
 *.app
 *.i*86
 *.x86_64
 *.hex
+*.DS_Store
 
 # Debug files
 *.dSYM/

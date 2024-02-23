@@ -24,12 +24,12 @@ Closet information is stored in the user's home folder, or document folder depen
 */
 
 int globalIndex;
-
+bool windows;
 
 void clearStdin();
 int getLatestIndex();
 void pressEnter();
-char *returnSavePath(int number);
+char returnSavePath(int number);
 void viewCloset();
 char *getUserHomeDir();
 void createDirectory(const char *path);
@@ -41,6 +41,7 @@ void userRemoveIndex();
 void modifyClosetIndex(int userIndex);
 void userSpecifyChangedIndex();
 void pressEnterOther();
+bool getOperatingSystem();
 
 
 void addClothesToCloset();
@@ -207,8 +208,8 @@ ADD TO CLOSET
 char* returnNameOfColor(){
 
     int c;
-    while ((c = getchar()) != '\n' && c != EOF) { }
-
+    //while ((c = getchar()) != '\n' && c != EOF) { }
+    
     char *nameOfColorOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
     printf("What is the name of the color of the clothing?\n> ");
     
@@ -216,15 +217,14 @@ char* returnNameOfColor(){
     {
         nameOfColorOfClothing[strcspn(nameOfColorOfClothing, "\n")] = 0;
     }
-    printf("Press ENTER to continue.");
     return nameOfColorOfClothing;
 }
 
 char* returnNameOfType(){
 
     int c;
-    while ((c = getchar()) != '\n' && c != EOF) { }
-
+    //while ((c = getchar()) != '\n' && c != EOF) { }
+    
     char *nameOfTypeOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
     printf("What is the name of the clothing?\n> ");
     
@@ -232,14 +232,13 @@ char* returnNameOfType(){
     {
         nameOfTypeOfClothing[strcspn(nameOfTypeOfClothing, "\n")] = 0;
     }
-    printf("Press ENTER to continue.");
     return nameOfTypeOfClothing;
 }
 
-char* returnQuantityOfClothing(){
+char* returnQuantityOfClothing(){ // String char[]
     int c;
-    while ((c = getchar()) != '\n' && c != EOF) { }
-
+    //while ((c = getchar()) != '\n' && c != EOF) { }
+    
     char *quantityOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
     printf("What is the quantity of the clothing?\n> ");
     
@@ -253,10 +252,13 @@ char* returnQuantityOfClothing(){
 void addClothesToCloset()
 {
 
+    getchar();
+
     char *currentClothesType = returnNameOfType();
     char *currentClothesColor = returnNameOfColor();
     char *currentClothesQuantity = returnQuantityOfClothing();
 
+    printf("Type: %s\nColor: %s\nQuantity: %s\n\n", currentClothesType, currentClothesColor, currentClothesQuantity);
     
     if (currentClothesType[0] == '\0' || currentClothesColor[0] == '\0' || currentClothesQuantity == 0)
     {
@@ -264,8 +266,6 @@ void addClothesToCloset()
         addClothesToCloset();
     }
     
-
-    printf("Color: %s\nType: %s\nQuantity: %s\n", currentClothesColor, currentClothesType, currentClothesQuantity);
 
     int currentClothesQuantityInt = atoi(currentClothesQuantity);
     
@@ -385,21 +385,21 @@ void modifyClosetIndex(int userIndex){
 
 void removeItem(int targetIndex){
     char *path = returnSavePath(0);
-
+    
     if (path == NULL) {
         fprintf(stderr, "The path was not found.\n");
         return;
     }
 
     FILE *inputFile = fopen(returnSavePath(0), "r");
-
+    printf("INPUT IS: %s\n\n", returnSavePath(0));  
     if (inputFile == NULL) {
         fprintf(stderr, "Could not open the file.\n");
         return;
     }
 
     FILE *outputFile = fopen(returnSavePath(1), "w");  // Create a temporary file
-
+    printf("OUTPUT IS: %s\n\n", returnSavePath(1));    
     if (outputFile == NULL) {
         fprintf(stderr, "Could not create the temporary file.\n");
         fclose(inputFile);
@@ -518,10 +518,20 @@ void createDirectory(const char *path)
 #endif
 }
 
-char *returnSavePath(int modifier)
+char returnSavePath(int modifier)
 {
     FILE *closetData;
     char *homeDir = getUserHomeDir();
+
+    char slash;
+
+    if (getOperatingSystem() == true){
+        slash = "\\";
+    }else{
+        slash = "/";
+    }
+    
+
     if (homeDir == NULL)
     {
         fprintf(stderr, "Failed to get the user home directory.\n");
@@ -529,7 +539,7 @@ char *returnSavePath(int modifier)
     }
 
     // Allocate enough space for the new path
-    char *dirPath = malloc(strlen(homeDir) + strlen("/ClosetIQ-CLI") + 1);
+    char dirPath = malloc(strlen(homeDir) + strlen(slash) + strlen("ClosetIQ-CLI") + 1);
     if (dirPath == NULL)
     {
         fprintf(stderr, "Memory allocation failed for directory path.\n");
@@ -537,13 +547,14 @@ char *returnSavePath(int modifier)
         exit(EXIT_FAILURE);
     }
     strcpy(dirPath, homeDir);
-    strcat(dirPath, "/ClosetIQ-CLI");
+    strcat(dirPath, slash);
+    strcat(dirPath, "ClosetIQ-CLI");
 
     // Create the directory
     createDirectory(dirPath);
 
     // Append the filename to the directory path
-    char *filePath = realloc(dirPath, strlen(dirPath) + strlen("/closetIQData.txt") + 1);
+    char *filePath = realloc(dirPath, strlen(dirPath) + strlen(slash) + strlen("closetIQData.txt") + 1);
     if (filePath == NULL)
     {
         fprintf(stderr, "Memory allocation failed for file path.\n");
@@ -551,9 +562,11 @@ char *returnSavePath(int modifier)
         exit(EXIT_FAILURE);
     }
     if (modifier == 0){
-        strcat(filePath, "/closetIQData.txt");
+        strcat(filePath, slash);
+        strcat(filePath, "closetIQData.txt");
     }else if(modifier == 1){
-        strcat(filePath, "/closetIQDataTemp.txt");
+        strcat(filePath, slash);
+        strcat(filePath, "closetIQDataTemp.txt");
     }
 
     // Attempt to open the file for reading
@@ -594,11 +607,34 @@ char *returnSavePath(int modifier)
     // Return filePath which now contains the path to the file
     return filePath;
 }
+
+bool getOperatingSystem(){
+
+    if (windows){
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
+void setOperatingSystem(bool boolean){
+    if (boolean){
+        windows = true;
+    }else{
+        windows = false;
+    }
+}
+
+
+
+
 char *getUserHomeDir()
 {
     char *homeDir;
 
 #ifdef _WIN32
+    setOperatingSystem(true);
     homeDir = getenv("USERPROFILE");
     if (homeDir == NULL)
     {
@@ -617,6 +653,7 @@ char *getUserHomeDir()
     }
 #else
     // On Unix-like systems, use HOME environment variable
+    setOperatingSystem(false);
     homeDir = getenv("HOME");
 
 #endif
