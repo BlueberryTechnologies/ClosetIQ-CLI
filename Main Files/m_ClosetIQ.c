@@ -11,10 +11,10 @@ Closet information is stored in the user's home folder, or document folder depen
 */
 
 #include "m_ClosetIQ.h"
-#include "../Closet Functions/add.c"
-#include "../Closet Functions/modify.c"
-#include "../Closet Functions/remove.c"
-#include "../Modules/modules.c"
+#include "../Functions/add.c"
+#include "../Functions/modify.c"
+#include "../Functions/remove.c"
+#include "../Functions/systemFunctions.c"
 
 /*
 Functions
