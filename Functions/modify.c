@@ -6,7 +6,11 @@ Functions
 
 void modifyIndex(){
     printf("What is the index you would like to modify?\n> ");
-    modifyIndexMenu(atoi(getUserInput()));
+    setUserInput();
+    int userIndexChoice = atoi(getUserInput());
+    printf("Press ENTER to continue.");
+    getchar();
+    modifyIndexMenu(userIndexChoice);
 }
 
 

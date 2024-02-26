@@ -31,14 +31,12 @@ void removeItem(int targetIndex){
     }
 
     FILE *inputFile = fopen(returnSavePath(0), "r");
-    printf("INPUT IS: %s\n\n", returnSavePath(0));  
     if (inputFile == NULL) {
         fprintf(stderr, "Could not open the file.\n");
         return;
     }
 
-    FILE *outputFile = fopen(returnSavePath(1), "w");  // Create a temporary file
-    printf("OUTPUT IS: %s\n\n", returnSavePath(1));    
+    FILE *outputFile = fopen(returnSavePath(1), "w");  // Create a temporary file   
     if (outputFile == NULL) {
         fprintf(stderr, "Could not create the temporary file.\n");
         fclose(inputFile);

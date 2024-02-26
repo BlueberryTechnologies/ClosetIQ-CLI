@@ -9,7 +9,7 @@ Variables
 char *userInput;
 char *clothingType;
 char *clothingColor;
-int clothingQuantity;
+int clothingQuantity = -1;
 
 /*
 Main
@@ -40,6 +40,7 @@ void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothi
     scanf(" %c", &userConfirmation);
     if (tolower(userConfirmation) == 'y')
     {
+        
         int index = getLatestIndex() + 1;
         printf("The values are being written to the closet.\n");
         FILE *file = fopen(returnSavePath(0), "a");
@@ -49,11 +50,19 @@ void confirmAddToCloset(char nameOfTypeOfClothing[100], char nameOfColorOfClothi
             fclose(file);
         }
         printf("The values were successfully written to the closet.\n");
+        clothingType = NULL;
+        clothingColor = NULL;
+        clothingQuantity = -1;
+        userInput = NULL;
         modifyClosetMenu();
     }
     else if (tolower(userConfirmation) == 'n')
     {
         printf("Please try again.\n");
+        clothingType = NULL;
+        clothingColor = NULL;
+        clothingQuantity = -1;
+        userInput = NULL;
         addClothesToCloset();
     }
     else
@@ -76,9 +85,13 @@ Setters and Getters
 
 void setClothingType(){
     printf("What is the type of clothing?\n> ");
+    setUserInput();
     clothingType = getUserInput();
 }
 char *getClothingType(){
+    if (clothingType == NULL){
+        setClothingType();
+    }
     return clothingType;
 }
 
@@ -86,9 +99,13 @@ char *getClothingType(){
 
 void setClothingColor(){
     printf("What is the color of clothing?\n> ");
+    setUserInput();
     clothingColor = getUserInput();
 }
 char *getClothingColor(){
+    if (clothingColor == NULL){
+        setClothingColor();
+    }
     return clothingColor;
 }
 
@@ -96,9 +113,13 @@ char *getClothingColor(){
 
 void setClothingQuantity(){
     printf("What is the quantity of clothing?\n> ");
+    setUserInput();
     clothingQuantity = atoi(getUserInput());
 }
 
 int getClothingQuantity(){
+    if (clothingQuantity == -1){
+        setClothingQuantity();
+    }
     return clothingQuantity;
 }

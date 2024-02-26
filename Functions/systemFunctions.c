@@ -109,7 +109,7 @@ void pressEnterOther(){
     int userProceed = getc(stdin);
     userMenu();
 }
-char returnSavePath(int modifier)
+char *returnSavePath(int modifier)
 {
     FILE *closetData;
     char *homeDir = getUserHomeDir();

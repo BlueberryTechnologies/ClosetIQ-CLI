@@ -37,11 +37,11 @@ void pressEnter();
 void pressEnterOther();
 bool getOperatingSystem();
 void setOperatingSystem(bool boolean);
-char returnSavePath(int modifier);
+char *returnSavePath(int modifier);
 char *getUserHomeDir();
 ////////////////
 void modifyIndex();
-void modifyIndexMenu();
+void modifyIndexMenu(int userIndex);
 ////////////////
 int main();
 void userMenu();
