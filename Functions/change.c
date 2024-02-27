@@ -1,5 +1,17 @@
 #include "../Main Files/m_ClosetIQ.h"
 
+int indexInsideFile;
+char *firstNameOfClothing;
+char *firstNameOfColorOfClothing;
+int firstQuantity;
+char *secondNameOfClothing;
+char *secondNameOfColorOfClothing;
+int secondQuantity;
+int count = 1;
+bool thingsSwappedOne = false;
+bool thingsSwappedTwo = false;
+
+
 /*
 Functions
 */
@@ -10,12 +22,65 @@ void changeIndex(int firstIndex){
     setUserInput();
     int replacedIndex = atoi(getUserInput());
     swapIndexes(firstIndex, replacedIndex);
+}
 
+void setFirstName(char *firstName){
+    char *firstNameTemp = malloc(MAX_USER_ENTERABLE_SIZE);
+    firstNameTemp = firstName;
+    firstNameOfClothing = firstNameTemp;
+}
+
+char *getFirstName(){
+    return firstNameOfClothing;
+}
+
+void setSecondName(char *secondName){
+    char *secondNameTemp = malloc(MAX_USER_ENTERABLE_SIZE);
+    secondNameTemp = secondName;
+    secondNameOfClothing = secondNameTemp;
+}
+
+char *getSecondName(){
+    return secondNameOfClothing;
+}
+
+void setFirstColor(char *firstColor){
+    char *firstColorTemp = malloc(MAX_USER_ENTERABLE_SIZE);
+    firstColorTemp = firstColor;
+    firstNameOfColorOfClothing = firstColorTemp;
+}
+
+char *getFirstColor(){
+    return firstNameOfColorOfClothing;
+}
+
+void setSecondColor(char *secondColor){
+    char *secondColorTemp = malloc(MAX_USER_ENTERABLE_SIZE);
+    secondColorTemp = secondColor;
+    secondNameOfColorOfClothing = secondColorTemp;
+}
+
+char *getSecondColor(){
+    return secondNameOfColorOfClothing;
+}
+
+void setFirstQuantity(int firstQuant){
+    firstQuantity = firstQuant;
+}
+
+int getFirstQuantity(){
+    return firstQuantity;
+}
+
+void setSecondQuantity(int secondQuant){
+    secondQuantity = secondQuant;
+}
+
+int getSecondQuantity(){
+    return secondQuantity;
 }
 
 void swapIndexes(int indexOne, int indexTwo){
-    printf("Index One: %d\nIndex Two: %d\n", indexOne, indexTwo);
-    
     char *path = returnSavePath(0);
     
     if (path == NULL) {
@@ -36,37 +101,70 @@ void swapIndexes(int indexOne, int indexTwo){
         return;
     }
 
-    int indexInsideFile;
-    char *firstNameOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    char *firstNameOfColorOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    int firstQuantity;
-    char *secondNameOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    char *secondNameOfColorOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    int secondQuantity;
-    char *currNameOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
-    char *currNameOfColorOfClothing = malloc(MAX_USER_ENTERABLE_SIZE);
+    
+    char *currNameOfClothing;
+    char *currNameOfColorOfClothing;
     int currQuantity;
-    int count = 1;
-    bool thingsDeleted = false;
+    
 
     while (fscanf(inputFile, "%d %s %s %d", &indexInsideFile, currNameOfClothing, currNameOfColorOfClothing, &currQuantity) == 4) {
         if (indexInsideFile != indexOne && indexInsideFile != indexTwo) {
             printf("Index: %d does not equal %d or %d\n", indexInsideFile, indexOne, indexTwo);
         }
         if(indexInsideFile == indexOne){
-            firstNameOfClothing = currNameOfClothing;
-            firstNameOfColorOfClothing = currNameOfColorOfClothing;
-            firstQuantity = currQuantity;
-            printf("Index One (%d) is: %s, %s, %d\n", indexInsideFile, firstNameOfClothing, firstNameOfColorOfClothing, firstQuantity);
+            setFirstName(currNameOfClothing);
+            setFirstColor(currNameOfColorOfClothing);
+            setFirstQuantity(currQuantity);
+            printf("First Index Before Swap (%d): %s, %s, %d\n", indexInsideFile, getFirstName(), getFirstColor(), getFirstQuantity());
         }
         if(indexInsideFile == indexTwo){
-            secondNameOfClothing = currNameOfClothing;
-            secondNameOfColorOfClothing = currNameOfColorOfClothing;
-            secondQuantity = currQuantity;
-            printf("Index Two (%d) is: %s, %s, %d\n", indexInsideFile, secondNameOfClothing, secondNameOfColorOfClothing, secondQuantity);
+            setSecondName(currNameOfClothing);
+            setSecondColor(currNameOfColorOfClothing);
+            setSecondQuantity(currQuantity);
+            printf("Second Index Before Swap (%d): %s, %s, %d\n\n", indexInsideFile, getSecondName(), getSecondColor(), getSecondQuantity());
         }
     }
-    printf("The First Index Values are: %s, %s, %d\nThe Second Index Values are: %s, %s, %d\n", firstNameOfClothing, firstNameOfColorOfClothing, firstQuantity, secondNameOfClothing, secondNameOfColorOfClothing, secondQuantity);
+
+    fclose(inputFile);
+
+    FILE *inputFileTwo = fopen(returnSavePath(0), "r");
+    if (inputFileTwo == NULL) {
+        fprintf(stderr, "Could not open the file.\n");
+        return;
+    }
+
+    while (fscanf(inputFileTwo, "%d %s %s %d", &indexInsideFile, currNameOfClothing, currNameOfColorOfClothing, &currQuantity) == 4) {
+        if (indexInsideFile != indexOne && indexInsideFile != indexTwo) {
+            fprintf(outputFile, "%d %s %s %d\n", count, currNameOfClothing, currNameOfColorOfClothing, currQuantity);
+            count++;
+        }
+        if(indexInsideFile == indexOne){
+            fprintf(outputFile, "%d %s %s %d\n", indexOne, getSecondName(), getSecondColor(), getSecondQuantity());
+            thingsSwappedOne = true;
+            count++;
+            printf("First Index After Swap (%d) is: %s, %s, %d\n", indexInsideFile, getSecondName(), getSecondColor(), getSecondQuantity());
+        }
+        if(indexInsideFile == indexTwo){
+            fprintf(outputFile, "%d %s %s %d\n", indexTwo, getFirstName(), getFirstColor(), getFirstQuantity());
+            thingsSwappedTwo = true;
+            count++;
+            printf("Second Index After Swap (%d) is: %s, %s, %d\n", indexInsideFile, getFirstName(), getFirstColor(), getFirstQuantity());
+        }
+    }
+
+    
+
+
+    if (thingsSwappedOne && thingsSwappedTwo){
+        fclose(outputFile);
+        fclose(inputFileTwo);
+        remove(path);
+        rename(returnSavePath(1), path);
+        printf("The value at index %d and %d was swapped successfully!\n", indexOne, indexTwo);
+    }else{
+        printf("There are no values to swap at that index. Try again.\n");
+        pressEnterOther();
+    }
 }
 
 /*

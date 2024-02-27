@@ -52,3 +52,15 @@ void viewCloset();
 ////////////////
 void changeIndex(int firstIndex);
 void swapIndexes(int indexOne, int indexTwo);
+void setFirstName(char *firstName);
+char *getFirstName();
+void setSecondName(char *secondName);
+char *getSecondName();
+void setFirstColor(char *firstColor);
+char *getFirstColor();
+void setSecondColor(char *secondColor);
+char *getSecondColor();
+void setFirstQuantity(int firstQuant);
+int getFirstQuantity();
+void setSecondQuantity(int secondQuant);
+int getSecondQuantity();
