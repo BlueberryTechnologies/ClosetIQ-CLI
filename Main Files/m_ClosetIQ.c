@@ -90,7 +90,6 @@ Allows the user to modify their closet. Add, remove, and change operations for t
     case 2:
     {
         modifyIndex();
-        pressEnter();
         break;
     }
     case 3:

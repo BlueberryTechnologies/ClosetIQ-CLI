@@ -50,4 +50,5 @@ void userMenu();
 void modifyClosetMenu();
 void viewCloset();
 ////////////////
-void changeIndex();
+void changeIndex(int firstIndex);
+void swapIndexes(int indexOne, int indexTwo);
