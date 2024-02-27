@@ -49,3 +49,5 @@ int main();
 void userMenu();
 void modifyClosetMenu();
 void viewCloset();
+////////////////
+void changeIndex();

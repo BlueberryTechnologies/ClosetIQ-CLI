@@ -40,7 +40,7 @@ void modifyIndexMenu(int userIndex){
 
     switch(selectedChoice){
         case 1:
-            break;
+            changeIndex();
         case 2:
             removeItem(userIndex);
         case 3:

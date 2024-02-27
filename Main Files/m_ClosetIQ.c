@@ -15,6 +15,7 @@ Closet information is stored in the user's home folder, or document folder depen
 #include "../Functions/modify.c"
 #include "../Functions/remove.c"
 #include "../Functions/systemFunctions.c"
+#include "../Functions/change.c"
 
 /*
 Functions
