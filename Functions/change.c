@@ -140,18 +140,23 @@ void swapIndexes(int indexOne, int indexTwo){
             printf("NOT ALLOWED\n");
         }
         if(indexInsideFile == indexOne){ // If the index is the first value
-            printf("Second Values -> First Index: %s, %s, %d\n", getFirstName(), getFirstColor(), getFirstQuantity());
+            printf("Second Index Values After Swap: %s, %s, %d\n", getSecondName(), getSecondColor(), getSecondQuantity());
+            /*printf("Second Values -> First Index: %s, %s, %d\n", getFirstName(), getFirstColor(), getFirstQuantity());
             fprintf(outputFile, "%d %s %s %d\n", indexOne, getFirstName(), getFirstColor(), getFirstQuantity());
             thingsSwappedOne = true;
             count++;
             printf("First Index After Swap (%d) is: %s, %s, %d\n", indexInsideFile, getSecondName(), getSecondColor(), getSecondQuantity());
+            */
         }
         if(indexInsideFile == indexTwo){ // If the index is the second value
+            printf("First Index Values After Swap : %s, %s, %d\n", getFirstName(), getFirstColor(), getFirstQuantity());
+            /*
             printf("First Values -> Second Index: %s, %s, %d\n", getSecondName(), getSecondColor(), getSecondQuantity());
             fprintf(outputFile, "%d %s %s %d\n", indexTwo, getSecondName(), getSecondColor(), getSecondQuantity());
             thingsSwappedTwo = true;
             count++;
             printf("Second Index After Swap (%d) is: %s, %s, %d\n", indexInsideFile, getFirstName(), getFirstColor(), getFirstQuantity());
+            */
         }
     }
 
