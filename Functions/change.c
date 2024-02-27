@@ -137,14 +137,15 @@ void swapIndexes(int indexOne, int indexTwo){
         if (indexInsideFile != indexOne && indexInsideFile != indexTwo) {
             fprintf(outputFile, "%d %s %s %d\n", count, currNameOfClothing, currNameOfColorOfClothing, currQuantity);
             count++;
+            printf("NOT ALLOWED\n");
         }
-        if(indexInsideFile == indexOne){
+        if(indexInsideFile == indexOne){ // If the index is the first value
             fprintf(outputFile, "%d %s %s %d\n", indexOne, getSecondName(), getSecondColor(), getSecondQuantity());
             thingsSwappedOne = true;
             count++;
             printf("First Index After Swap (%d) is: %s, %s, %d\n", indexInsideFile, getSecondName(), getSecondColor(), getSecondQuantity());
         }
-        if(indexInsideFile == indexTwo){
+        if(indexInsideFile == indexTwo){ // If the index is the second value
             fprintf(outputFile, "%d %s %s %d\n", indexTwo, getFirstName(), getFirstColor(), getFirstQuantity());
             thingsSwappedTwo = true;
             count++;
@@ -158,8 +159,8 @@ void swapIndexes(int indexOne, int indexTwo){
     if (thingsSwappedOne && thingsSwappedTwo){
         fclose(outputFile);
         fclose(inputFileTwo);
-        remove(path);
-        rename(returnSavePath(1), path);
+        //remove(path);
+        //rename(returnSavePath(1), path);
         printf("The value at index %d and %d was swapped successfully!\n", indexOne, indexTwo);
     }else{
         printf("There are no values to swap at that index. Try again.\n");
