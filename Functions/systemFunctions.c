@@ -51,6 +51,10 @@ char *getUserInput(){
     return userInput;
 }
 
+void clearUserInput(){
+    userInput = NULL;
+}
+
 int getLatestIndex(){ // This returns the index from the file
     char *path = returnSavePath(0);
 
@@ -108,6 +112,10 @@ void pressEnterOther(){
     printf("Press the ENTER key to continue back to the menu:");
     int userProceed = getc(stdin);
     userMenu();
+}
+void clearBuffer(){
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
 }
 char *returnSavePath(int modifier)
 {

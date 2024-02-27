@@ -3,14 +3,17 @@
 Functions
 */
 
+int userIndex;
+
 
 void modifyIndex(){
-    printf("What is the index you would like to modify?\n> ");
+    clearUserInput();
+    clearBuffer();
+    printf("What is the index of clothing?\n> ");
     setUserInput();
-    int userIndexChoice = atoi(getUserInput());
+    userIndex = atoi(getUserInput());
     printf("Press ENTER to continue.");
-    getchar();
-    modifyIndexMenu(userIndexChoice);
+    modifyIndexMenu(userIndex);
 }
 
 

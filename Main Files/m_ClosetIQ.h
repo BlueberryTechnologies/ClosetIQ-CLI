@@ -30,11 +30,13 @@ void removeItem(int targetIndex);
 ////////////////
 void setUserInput();
 char *getUserInput();
+void clearUserInput();
 void setGlobalIndex(int index);
 int getGlobalIndex();
 int getLatestIndex();
 void pressEnter();
 void pressEnterOther();
+void clearBuffer();
 bool getOperatingSystem();
 void setOperatingSystem(bool boolean);
 char *returnSavePath(int modifier);
